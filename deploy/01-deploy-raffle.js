@@ -29,7 +29,7 @@ const {verify} = require("../helper-hardhat-config")
 
 
 module.exports = async function ({getNamedAccounts, deployments}){
-    console.log("fuck this")
+
 
     const {deploy, log} = deployments
     const {deployer} = await getNamedAccounts()
@@ -39,14 +39,17 @@ module.exports = async function ({getNamedAccounts, deployments}){
     let vrfCoordinatorV2Address, subscriptionId
 
     if(developmentChains.includes(network.name)){
+        // const vrfCoordinatorV2Mock = await deployments.get("VRFCoordinatorV2Mock")
         const vrfCoordinatorV2Mock = await deployments.get("VRFCoordinatorV2Mock")
         vrfCoordinatorV2Address = vrfCoordinatorV2Mock.address
+        console.log(vrfCoordinatorV2Address)
+        let vrfV2Mock = await ethers.getContractAt("VRFCoordinatorV2Mock", vrfCoordinatorV2Address)
         //create a local subscription to get the subscriptionID
-        const transactionResponse = await vrfCoordinatorV2Mock.createSubscription()
+        const transactionResponse = await vrfV2Mock.createSubscription()
         const transactionReciept = await transactionResponse.wait(1)
         subscriptionId = transactionReciept.events[0].args.subId
         //find the subscription
-        await vrfCoordinatorV2Mock.fundSubscription(subscriptionId, FUND_AMOUNT)
+        await vrfV2Mock.fundSubscription(subscriptionId, FUND_AMOUNT)
     }else{
         vrfCoordinatorV2Address = networkConfig[chainId]["vrfCoordinatortV2"]
         //subscription Id
@@ -73,6 +76,7 @@ module.exports = async function ({getNamedAccounts, deployments}){
         waitConfirmations: network.config.blockConfirmations || 1
     })
 
+    console.log(raffle.address);
 
     if(!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY){
         log("verifying...")
