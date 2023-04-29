@@ -13,6 +13,7 @@ const GAS_PRICE_LINK = 1E9
     : describe("Raffle Unit Tests", function () {
         let owner,contract, subId, vrfAddress
         const chainId = network.config.chainId
+        console.log(chainId)
         before(async () => {
             [owner] = await ethers.getSigners()
             const vrfCoordinatorV2Mock = await ethers.getContractFactory("VRFCoordinatorV2Mock")
@@ -42,6 +43,8 @@ const GAS_PRICE_LINK = 1E9
              
                 const raffa = await ethers.getContractFactory("Raffle")
                 const raf = await raffa.deploy(vrfAddress, entranceFee, gasLane, subId, callBackGasLimit, interval)
+                console.log(raf.address)
+                console.log(raf.interface.format(ethers.utils.FormatTypes.json))
             })
         })
   
